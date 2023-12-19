@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class FileManager {
-    private static final String FILE_PATH = "src/main/resources/TABLE.txt";
+    private static final String FILE_PATH = "app/src/main/resources/TABLE.txt";
 
     public static Map<String, Map<String, String>> loadTableFromFile() {
         File file = new File(FILE_PATH);

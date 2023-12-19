@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.Map;
 
 public class AdvancedJavaExercise {
-    private static final String FILE_PATH = "src/main/resources/TABLE.txt";
+    private static final String FILE_PATH = "app/src/main/resources/TABLE.txt";
 
     public static void main(String[] args) {
         Map<String, Map<String, String>> table;
