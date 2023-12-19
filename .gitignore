@@ -1,2 +1,4 @@
 # ignore all .xml files
 *dependency-reduced-pom.xml
+.idea/
+target/
