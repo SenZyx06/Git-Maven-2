@@ -9,12 +9,12 @@ import java.util.Map;
 public class TableManager {
     private Map<String, Map<String, String>> table;
     private int charType = TableGenerator.defaultCharTypeValue();
+    UserInput userInput = new UserInput();
+    TableUtil tableUtil = new TableUtil();
 
     public TableManager(Map<String, Map<String, String>> table) {
         this.table = table;
     }
-
-    UserInput userInput = new UserInput();
 
     public void searchStringTable() {
         String searchString = userInput.getStringInput("Enter the character sequence: ");
@@ -32,8 +32,8 @@ public class TableManager {
                 String key = innerEntry.getKey();
                 String value = innerEntry.getValue();
 
-                int keyInstances = countInstances(key, searchString);
-                int valueInstances = countInstances(value, searchString);
+                int keyInstances = tableUtil.countInstances(key, searchString);
+                int valueInstances = tableUtil.countInstances(value, searchString);
 
                 if (keyInstances > 0) {
                     System.out.println("Found \"" + searchString + "\" on (" + rowIndex + ", "
@@ -64,7 +64,7 @@ public class TableManager {
             if (columnIndex >= 0 && columnIndex < noOfColumns) {
                 int editKeyOrValue = userInput.getIntInput("Choose which to edit (1 - Key, 2 - Value): ");
 
-                if (isValidIndices(rowKey, columnIndex)) {
+                if (tableUtil.isValidIndices(rowKey, columnIndex, table)) {
                     Map<String, String> innerMap = table.get(rowKey);
                     List<String> columns = new ArrayList<>(innerMap.keySet());
                     if (columnIndex >= 0 && columnIndex < columns.size()) {
@@ -75,11 +75,12 @@ public class TableManager {
                             String newChars = userInput.getStringInput(
                                     "Enter the new characters (length: " + selectedKey.length() + "): ");
 
-                            if (isNewKeyValid(innerMap, newChars, isKeyChange, selectedKey)) {
+                            if (tableUtil.isNewKeyValid(innerMap, newChars, isKeyChange, selectedKey, table)) {
                                 if (isKeyChange) {
-                                    performKeyChange(rowKey, innerMap, columns, selectedKey, selectedValue, newChars);
+                                    tableUtil.performKeyChange(rowKey, innerMap, columns, selectedKey, selectedValue,
+                                            newChars, table);
                                 } else {
-                                    performValueChange(innerMap, selectedKey, newChars);
+                                    tableUtil.performValueChange(innerMap, selectedKey, newChars);
                                 }
                             }
                         } else {
@@ -168,78 +169,6 @@ public class TableManager {
         }
 
         System.out.println("Table rows sorted!");
-    }
-
-    private boolean isValidIndices(String rowIndex, int columnIndex) {
-        if (table.containsKey(rowIndex)) {
-            Map<String, String> innerMap = table.get(rowIndex);
-            List<String> columns = new ArrayList<>(innerMap.keySet());
-            return columnIndex >= 0 && columnIndex < columns.size();
-        }
-        return false;
-    }
-
-    private boolean isNewKeyValid(Map<String, String> innerMap, String newChars, boolean isKeyChange,
-            String selectedKey) {
-        boolean isNewKeyAlreadyExists = table.values().stream()
-                .anyMatch(map -> map.containsKey(newChars));
-
-        if (isNewKeyAlreadyExists) {
-            System.out.println("Error: The new key already exists in the table.");
-            return false;
-        }
-
-        if (isKeyChange && innerMap.containsKey(newChars)
-                && !innerMap.get(newChars).equals(innerMap.get(selectedKey))) {
-            System.out.println("Error: The new key already exists in the current row.");
-            return false;
-        }
-
-        return true;
-    }
-
-    private void performKeyChange(String rowKey, Map<String, String> innerMap, List<String> columns, String selectedKey,
-            String selectedValue, String newChars) {
-        if (newChars.length() == selectedKey.length()) {
-            Map<String, String> updatedMap = new LinkedHashMap<>();
-            for (String column : columns) {
-                if (column.equals(selectedKey)) {
-                    updatedMap.put(newChars, selectedValue);
-                } else {
-                    updatedMap.put(column, innerMap.get(column));
-                }
-            }
-            table.put(rowKey, updatedMap);
-            System.out.println("Edit successful. \nUpdated Table:");
-        } else {
-            System.out.println("Error: The length of the input does not match the length of the selected key.");
-        }
-    }
-
-    private void performValueChange(Map<String, String> innerMap, String selectedKey, String newChars) {
-        String selectedValue = innerMap.get(selectedKey);
-        if (newChars.length() == selectedValue.length()) {
-            innerMap.put(selectedKey, newChars);
-            System.out.println("Edit successful. \nUpdated Table:");
-        } else {
-            System.out.println("Error: The length of the input does not match the length of the selected value.");
-        }
-    }
-
-    private int countInstances(String input, String searchSequence) {
-        int count = 0;
-        int index = input.indexOf(searchSequence);
-
-        while (index != -1) {
-            count++;
-            index = input.indexOf(searchSequence, index + 1);
-        }
-
-        return count;
-    }
-
-    public Map<String, Map<String, String>> getTable() {
-        return this.table;
     }
 
 }

@@ -10,8 +10,11 @@ public class AdvancedJavaExercise {
         Map<String, Map<String, String>> table;
         UserInput userInput = new UserInput();
         File tableFile = new File(FILE_PATH);
+        TableHolder tableHolder;
+
         if (tableFile.exists()) {
             table = FileManager.loadTableFromFile();
+            tableHolder = new TableHolder(table);
         } else {
             System.out.println("Error: File not found. Create a new table and file.");
             int rows = userInput.getTableDimensionInput("Enter the number of rows (x):");
@@ -19,9 +22,10 @@ public class AdvancedJavaExercise {
             int charType = TableGenerator.defaultCharTypeValue();
             table = TableGenerator.generateTable(rows, columns, charType);
             FileManager.saveTableToFile(table, tableFile);
+            tableHolder = new TableHolder(table);
         }
 
-        TableManager tableManager = new TableManager(table);
+        TableManager tableManager = new TableManager(tableHolder.getTable());
 
         while (true) {
             System.out.println("\nMenu:");
@@ -41,7 +45,7 @@ public class AdvancedJavaExercise {
 
                 case 2:
                     tableManager.editCell();
-                    FileManager.saveTableToFile(tableManager.getTable(), tableFile);
+                    FileManager.saveTableToFile(tableHolder.getTable(), tableFile);
                     break;
 
                 case 3:
@@ -50,19 +54,19 @@ public class AdvancedJavaExercise {
 
                 case 4:
                     tableManager.resetTable();
-                    FileManager.saveTableToFile(tableManager.getTable(), tableFile);
+                    FileManager.saveTableToFile(tableHolder.getTable(), tableFile);
                     break;
                 case 5:
                     tableManager.addRow();
-                    FileManager.saveTableToFile(tableManager.getTable(), tableFile);
+                    FileManager.saveTableToFile(tableHolder.getTable(), tableFile);
                     break;
                 case 6:
                     tableManager.sortRows();
-                    FileManager.saveTableToFile(tableManager.getTable(), tableFile);
+                    FileManager.saveTableToFile(tableHolder.getTable(), tableFile);
                     break;
                 case 7:
                     System.out.println("Exiting the program. Goodbye!");
-                    FileManager.saveTableToFile(tableManager.getTable(), tableFile);
+                    FileManager.saveTableToFile(tableHolder.getTable(), tableFile);
                     System.exit(0);
                     break;
                 default:
